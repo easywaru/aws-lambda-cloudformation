@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'deploy lambda with js file by cloudformation'
+
+Parameters: 
+  # getting contents of js by shell
+  LambdaFunctionContents: 
+    Type: String
+
+Resources:
+  MyLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: MyLambdaRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: MyLambdaPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:*
+            Resource: "*"
+
+  MyLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties: 
+      FunctionName: MyLambdaFunction
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Role: !GetAtt MyLambdaRole.Arn
+      Code: 
+        ZipFile: !Ref LambdaFunctionContents
